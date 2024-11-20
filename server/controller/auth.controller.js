@@ -9,6 +9,7 @@ import AuthService from '../services/auth.service.js';
 
 // Models
 import User from '../models/user.model.js';
+import emailService from '../services/email.service.js';
 
 export const singUp = asyncHandler(async (req, res, next) => {
     const { email, username, fullname, password, authMethod } = req.body;
@@ -20,7 +21,7 @@ export const singUp = asyncHandler(async (req, res, next) => {
 
 
     if (authMethod === 'password') {
-        const authResult = await AuthService.signup({
+        await AuthService.signup({
             email,
             username,
             fullname,
@@ -30,17 +31,11 @@ export const singUp = asyncHandler(async (req, res, next) => {
             response: res
         });
 
-        return res.status(201).json(new ApiResponse({
-            status: true,
-            message: 'Account created successfully. Check your email to verify your account',
-            data: authResult,
-        }));
-
     } else if (authMethod === 'google') {
 
         const { password } = req.body;
 
-        const authResult = await AuthService.signup({
+        await AuthService.signup({
             email: null, // Will be extracted from Google token
             username: null, // Will be generated
             fullname: null, // Will be extracted from Google token
@@ -49,14 +44,8 @@ export const singUp = asyncHandler(async (req, res, next) => {
             authMethod: 'google',
             response: res
         });
-
-        return res.status(201).json(new ApiResponse({
-            status: true,
-            message: 'Account created successfully',
-            data: authResult,
-        }));
     } else {
-        return res.status(400).json(new ApiResponse({
+        res.status(400).json(new ApiResponse({
             status: false,
             message: 'Invalid authentication method',
             data: null,
@@ -65,27 +54,20 @@ export const singUp = asyncHandler(async (req, res, next) => {
 });
 
 export const login = asyncHandler(async (req, res, next) => {
-    console.log(req.body);
     const { email, password, authMethod } = req.body;
 
     if (authMethod === 'password') {
-        const authResult = await AuthService.login({
+        await AuthService.login({
             email,
             password,
             authMethod: 'password',
             response: res
         });
 
-        return res.status(200).json(new ApiResponse({
-            status: true,
-            message: 'Login successful',
-            data: authResult,
-        }));
-
     } else if (authMethod === 'google') {
         const { password: idToken } = req.body;
 
-        const authResult = await AuthService.login({
+        await AuthService.login({
             email,
             idToken,
             authMethod: 'google',
@@ -126,5 +108,29 @@ export const verifyEmail = asyncHandler(async (req, res, next) => {
         data: {
             ...tokens,
         },
+    }));
+});
+
+export const resendVerificationEmail = asyncHandler(async (req, res, next) => {
+    const { token } = req.body;
+
+    const user = await User.findOne({ 'account_info.verificationToken': token });
+
+    if (!user) {
+        return res.status(404).json(new ApiResponse({
+            status: false,
+            message: 'Invalid verification token',
+            data: null,
+        }));
+    }
+
+    const verificationUrl = emailService.generateEmailVerificationLink(token);
+
+    await AuthService.sendVerificationEmail(user.personal_info.email,verificationUrl);
+
+    return res.status(200).json(new ApiResponse({
+        status: true,
+        message: 'Verification email sent successfully',
+        data: null,
     }));
 });

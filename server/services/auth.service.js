@@ -62,7 +62,7 @@ class AuthService {
 
         // If user exists with different auth method, throw an error
         if (existingUser && existingUser.account_info.auth_type !== authMethod) {
-            response.status(403).json(new ApiResponse({
+            return response.status(403).json(new ApiResponse({
                 status: false,
                 message: `Account already exists with ${existingUser.account_info.auth_type} authentication`,
                 data: null,
@@ -74,7 +74,7 @@ class AuthService {
                 fullname,
                 email,
                 username: username,
-                avatar: authMethod != 'google' ? this.generateAvatar(fullname) : null
+                avatar: authMethod != 'google' ? avatar ? avatar : this.generateAvatar(fullname) : null
             },
             account_info: {
                 auth_type: authMethod,
@@ -112,6 +112,12 @@ class AuthService {
         if (authMethod === 'password' && !user.account_info.isEmailVerified) {
             const verificationUrl = mailService.generateEmailVerificationLink(user.account_info.verificationToken);
             await this.sendVerificationEmail(email, verificationUrl);
+
+            return response.status(201).json(new ApiResponse({
+                status: true,
+                message: 'Account created successfully. Check your email to verify your account',
+                data: null,
+            }));
         }
 
         let data = null;
@@ -130,7 +136,11 @@ class AuthService {
             data = null;
         }
 
-        return data;
+        return response.status(201).json(new ApiResponse({
+            status: true,
+            message: 'Account created successfully',
+            data
+        }));
     }
 
     /**
@@ -154,7 +164,7 @@ class AuthService {
 
         // Check if user exists
         if (!user) {
-            response.status(404).json(new ApiResponse({
+            return response.status(404).json(new ApiResponse({
                 status: false,
                 message: 'Invalid email or password',
                 data: null,
@@ -163,7 +173,7 @@ class AuthService {
 
         // Validate authentication method
         if (user.account_info.auth_type !== authMethod) {
-            response.status(403).json(new ApiResponse({
+            return response.status(403).json(new ApiResponse({
                 status: false,
                 message: `Please login with ${user.account_info.auth_type}`,
                 data: null,
@@ -218,7 +228,7 @@ class AuthService {
 
                 // Verify that the Google email matches the stored email
                 if (googleUserInfo.email !== email) {
-                    response.status(403).json(new ApiResponse({
+                    return response.status(403).json(new ApiResponse({
                         status: false,
                         message: 'Google authentication failed: Email mismatch',
                         data: null,
@@ -226,7 +236,7 @@ class AuthService {
                 }
             } catch (error) {
                 console.error('Google auth error:', error);
-                response.status(403).json(new ApiResponse({
+                return response.status(403).json(new ApiResponse({
                     status: false,
                     message: 'Invalid Google authentication',
                     data: null,
@@ -248,7 +258,7 @@ class AuthService {
             ...tokens
         };
 
-        response.status(200).json(new ApiResponse({
+        return response.status(200).json(new ApiResponse({
             status: true,
             message: 'Login successful',
             data

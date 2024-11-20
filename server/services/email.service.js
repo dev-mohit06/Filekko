@@ -18,7 +18,7 @@ class EmailService {
         });
     }
 
-    async sendEmail({ to, subject, text, html, next }) {
+    async sendEmail({ to, subject, text, html }) {
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to,
@@ -33,7 +33,6 @@ class EmailService {
             return info.response;
         } catch (error) {
             console.error('Error sending email:', error.message);
-            next(error);
         }
     }
 
