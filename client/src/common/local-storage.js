@@ -1,122 +1,79 @@
-/**
- * @typedef {Object} ApiResponse
- * @property {boolean} status - Success status
- * @property {string} message - Response message
- * @property {any} data - Response data (can be null)
- */
+class LocalStorage {
+    static TOKEN_KEY = 'auth_tokens';
+    static USER_KEY = 'user_info';
 
-/**
- * @typedef {Object} UserData
- * @property {string} id - User's unique identifier
- * @property {string} email - User's email
- * @property {string} name - User's name
- * @property {string} [avatar] - Optional avatar URL
- * @property {boolean} isEmailVerified - Email verification status
- */
-
-// Storage keys as constants
-const STORAGE_KEYS = {
-    AUTH_STATE: 'auth_state',
-    TOKEN: 'auth_token',
-};
-
-class LocalStorageService {
-    static #instance = null;
-
-    constructor() {
-        if (LocalStorageService.#instance) {
-            return LocalStorageService.#instance;
-        }
-        LocalStorageService.#instance = this;
-    }
-
-    /**
-     * Get the singleton instance
-     * @returns {LocalStorageService}
-     */
-    static getInstance() {
-        if (!LocalStorageService.#instance) {
-            LocalStorageService.#instance = new LocalStorageService();
-        }
-        return LocalStorageService.#instance;
-    }
-
-    /**
-     * Save authentication state to localStorage
-     * @param {Object} authState - The authentication state to save
-     */
-    saveAuthState(authState) {
+    static setTokens(tokens) {
         try {
-            const serializedState = JSON.stringify(authState);
-            localStorage.setItem(STORAGE_KEYS.AUTH_STATE, serializedState);
-
-            // Also save token separately for easy access
-            if (authState.token) {
-                localStorage.setItem(STORAGE_KEYS.TOKEN, authState.token);
-            }
+            localStorage.setItem(this.TOKEN_KEY, JSON.stringify(tokens));
         } catch (error) {
-            console.error('Error saving auth state:', error);
-            this.clearAuth();
+            console.error('Error saving tokens:', error);
+            throw error;
         }
     }
 
-    /**
-     * Get the complete authentication state
-     * @returns {Object|null}
-     */
-    getAuthState() {
+    static setUser(user) {
         try {
-            const serializedState = localStorage.getItem(STORAGE_KEYS.AUTH_STATE);
-            if (!serializedState) return null;
-            return JSON.parse(serializedState);
+            localStorage.setItem(this.USER_KEY, JSON.stringify(user));
         } catch (error) {
-            console.error('Error reading auth state:', error);
-            this.clearAuth();
+            console.error('Error saving user:', error);
+            throw error;
+        }
+    }
+
+    static getTokens() {
+        try {
+            const tokens = localStorage.getItem(this.TOKEN_KEY);
+            return tokens ? JSON.parse(tokens) : null;
+        } catch (error) {
+            console.error('Error reading tokens:', error);
             return null;
         }
     }
 
-    /**
-     * Get the authentication token
-     * @returns {string|null}
-     */
-    getToken() {
+    static getUser() {
         try {
-            return localStorage.getItem(STORAGE_KEYS.TOKEN);
+            const user = localStorage.getItem(this.USER_KEY);
+            return user ? JSON.parse(user) : null;
         } catch (error) {
-            console.error('Error reading token:', error);
+            console.error('Error reading user:', error);
             return null;
         }
     }
 
-    /**
-     * Get user data
-     * @returns {UserData|null}
-     */
-    getUserData() {
-        const authState = this.getAuthState();
-        return authState?.user ?? null;
+    static getAccessToken() {
+        const tokens = this.getTokens();
+        return tokens?.accessToken || null;
     }
 
-    /**
-     * Clear all authentication data
-     */
-    clearAuth() {
+    static getRefreshToken() {
+        const tokens = this.getTokens();
+        return tokens?.refreshToken || null;
+    }
+
+    static isAuthenticated() {
+        return !!this.getAccessToken();
+    }
+
+    static handleLoginSuccess(response) {
         try {
-            localStorage.removeItem(STORAGE_KEYS.AUTH_STATE);
-            localStorage.removeItem(STORAGE_KEYS.TOKEN);
+            const { accessToken, refreshToken, user } = response.data;
+            this.setTokens({ accessToken, refreshToken });
+            this.setUser(user);
         } catch (error) {
-            console.error('Error clearing auth data:', error);
+            console.error('Error handling login:', error);
+            throw error;
         }
     }
 
-    /**
-     * Check if user is authenticated
-     * @returns {boolean}
-     */
-    isAuthenticated() {
-        return Boolean(this.getToken());
+    static clearAuth() {
+        try {
+            localStorage.removeItem(this.TOKEN_KEY);
+            localStorage.removeItem(this.USER_KEY);
+        } catch (error) {
+            console.error('Error clearing auth:', error);
+            throw error;
+        }
     }
 }
 
-export const localStorageService = LocalStorageService.getInstance();
+export default LocalStorage;

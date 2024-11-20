@@ -2,7 +2,7 @@
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { useQuery, useMutation, useInfiniteQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { apiClient } from './api-client';
 
 const queryClient = new QueryClient({
@@ -63,65 +63,11 @@ class QueryService {
         });
     }
 
-    static useInfiniteData(key, endpoint, config) {
-        const {
-            initialParams,
-            getNextPageParam,
-            ...restConfig
-        } = config;
-
-        const finalConfig = { ...this.#DEFAULT_CONFIG, ...restConfig };
-
-        return useInfiniteQuery({
-            queryKey: this.createQueryKey(key, initialParams),
-            queryFn: async ({ pageParam = initialParams }) => {
-                try {
-                    const response = await apiClient.get(endpoint, {
-                        params: pageParam,
-                    });
-                    return response;
-                } catch (error) {
-                    throw this.formatError(error);
-                }
-            },
-            getNextPageParam,
-            ...finalConfig,
-        });
-    }
-
     static useCreate(endpoint, config = {}) {
         return useMutation({
             mutationFn: async (data) => {
                 try {
                     const response = await apiClient.post(endpoint, data);
-                    return response;
-                } catch (error) {
-                    throw this.formatError(error);
-                }
-            },
-            ...config,
-        });
-    }
-
-    static useUpdate(endpoint, config = {}) {
-        return useMutation({
-            mutationFn: async ({ id, data }) => {
-                try {
-                    const response = await apiClient.put(`${endpoint}/${id}`, data);
-                    return response;
-                } catch (error) {
-                    throw this.formatError(error);
-                }
-            },
-            ...config,
-        });
-    }
-
-    static useDelete(endpoint, config = {}) {
-        return useMutation({
-            mutationFn: async (id) => {
-                try {
-                    const response = await apiClient.delete(`${endpoint}/${id}`);
                     return response;
                 } catch (error) {
                     throw this.formatError(error);

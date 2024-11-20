@@ -3,12 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import QueryService from '../common/query-service';
-import { localStorageService } from '../common/local-storage';
 import logo from '../imgs/logo.svg';
 import Google from '../imgs/google.png';
 import BackgroundDecorations from '../components/background-decorations';
 import { authWithGoogle } from '../common/firebase.js';
 import toast, { Toaster } from 'react-hot-toast';
+import { useUser } from '../common/context';
 
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -118,6 +118,8 @@ const AuthPage = ({ show }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const { login } = useUser(); // Get login function from context
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -151,12 +153,9 @@ const AuthPage = ({ show }) => {
     onSuccess: useCallback(
       (response) => {
         if (response?.status) {
-          localStorageService.saveAuthState({
-            token: response.data.token,
-            user: response.data.user,
-          });
+          login(response); // Call context login function
           showToast('success', 'Login successful!');
-          navigate('/dashboard');
+          navigate('/');
         }
       },
       [navigate, showToast]
@@ -177,8 +176,22 @@ const AuthPage = ({ show }) => {
   const signupMutation = QueryService.useCreate('/auth/signup', {
     onSuccess: useCallback(
       (response) => {
+        console.log(response);
+        if (response?.status) {
+          if (response?.data) {
+            showToast('success', 'Account created successfully and logged successfully!');
+            setTimeout(() => {
+              login(response);
+              navigate('/');
+              return;
+            }, 1000);
+            return;
+          }
+        }
+
         if (response?.status) {
           showToast('success', 'Account created successfully!');
+          setIsLogin(true);
           navigate('/auth/login');
         }
       },

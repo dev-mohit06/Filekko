@@ -4,7 +4,7 @@ import BackgroundDecorations from './background-decorations';
 import { BookMarked, BookOpen, Clock, LogOut, Menu, Settings, Upload, User2, X } from 'lucide-react';
 import logo from '../imgs/logo.svg';
 
-const HomeLayout = () => {
+const HomeLayout = ({ children }) => {
     const location = useLocation();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -73,7 +73,7 @@ const HomeLayout = () => {
                     </button> : null
                 }
 
-                <Outlet />
+                {children ? children : <Outlet />}
             </div>
         </div>
     );
