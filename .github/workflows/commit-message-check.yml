@@ -1,0 +1,33 @@
+name: Commit Message Validation
+
+on:
+  push:
+    branches:
+      - main
+      - feature
+  pull_request:
+    branches:
+      - main
+      - feature
+
+jobs:
+  validate-commit-message:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Get recent commit messages
+        run: |
+          git log --format="%s" -n 10 > commit-messages.txt
+          
+      - name: Validate commit messages
+        run: |
+          regex="^(feat|fix|chore|docs|style|refactor|perf|test|build|ci|revert)(\([a-z]+\))?: .{1,100}$"
+          while IFS= read -r line; do
+            if ! [[ $line =~ $regex ]]; then
+              echo "Invalid commit message: $line"
+              exit 1
+            fi
+          done < commit-messages.txt
