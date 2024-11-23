@@ -1,8 +1,50 @@
-# React + Vite
+# Client Setup
+Follow these steps to set up the client project.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Author
+- [Mohit Paddhariya](https://github.con/dev-mohit06)
 
-Currently, two official plugins are available:
+## Prerequisites
+- Node.js (v14 or higher)
+- npm (v6 or higher) or yarn
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Installation
+1. Clone the repository:
+    ```sh
+    git clone https://github.com/dev-mohit06/filekko.git
+    ```
+2. Navigate to the client directory:
+    ```sh
+    cd filekko/client
+    ```
+3. Install dependencies:
+    ```sh
+    npm install
+    ```
+    or
+    ```sh
+    yarn install
+    ```
+
+## Running the Application
+
+To start the development server, run:
+```sh
+npm run dev
+```
+or
+```sh
+yarn run dev
+```
+
+## Firebase Configuration
+
+To set up Firebase configuration, follow these steps:
+
+1. Create a Firebase project in the [Firebase Console](https://console.firebase.google.com/).
+
+2. Add a new web app to your Firebase project and copy the Firebase configuration details.
+
+3. In the `src/common` folder, create a file named `firebaseConfig.js`.
+
+4. Add create the following code file to `src/common/firebaseConfig.js` and paste the Firebase configuration details.

@@ -1,24 +1,47 @@
 # Filekko
 
-Filekko is a resource-sharing platform for students to upload, share, and manage academic materials such as notes and study guides. Users can like, share, comment, and request to contribute to resources. A dashboard helps users track their shared materials and engagement.
+## Overview
+Filekko is a user-friendly platform that bridges the gap between technical and non-technical users for resource sharing and documentation. Unlike traditional platforms like GitHub that require Markdown knowledge, Filekko provides an intuitive interface for storing files along with notes, making knowledge sharing accessible to everyone.
 
-## Features
+### Key Features
+- Simple sign-in system for user authentication
+- Easy-to-use resource upload interface
+- Flexible visibility options (public/private)
+- Community resource exploration
+- Note-taking without Markdown knowledge
+- Integrated file and documentation management
 
-- Upload and share academic resources
-- Like, share, and comment on resources
-- Request contributor access to shared resources
-- Dashboard for managing resources and tracking interactions
+## Project Structure
+```
+filekko/
+├── client/         # Frontend application
+│   └── README.md   # Client setup instructions
+├── server/         # Backend application
+│   └── README.md   # Server setup instructions
+└── docs/           # Project documentation
+    └── CONTRIBUTING.md  # Contribution guidelines
+```
 
-## Tech Stack
+### Prerequisites
+- Node.js (v14 or higher)
+- npm or yarn
+- MongoDB (for database)
 
-- **Frontend**: React.js
-- **Backend**: Node.js, Express.js
-- **Database**: MongoDB
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/dev-mohit06/filekko.git
+cd filekko
+```
+
+2. For setup instructions:
+   - Frontend setup: See [client/README.md](./client/README.md)
+   - Backend setup: See [server/README.md](./server/README.md)
 
 ## Documentation
 
-You can find detailed documentation for contributing, installation, and other guidelines in the `docs` folder:
-
-- [Contributing Guidelines](./docs/CONTRIBUTING.md)
-<!-- - [Installation Instructions](./docs/INSTALLATION.md)
-- [API Reference](./docs/API_REFERENCE.md) -->
+Detailed documentation can be found in the following locations:
+- Frontend documentation: [client/README.md](./client/README.md)
+- Backend documentation: [server/README.md](./server/README.md)
+- Contribution guidelines: [docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md)
